@@ -29,7 +29,11 @@ class AtariDqnModel(torch.nn.Module):
         stored within this method."""
         super().__init__()
         self.dueling = dueling
-        c, h, w = image_shape
+        if len(image_shape) == 4:
+            n, c, h, w = image_shape
+            c = n * c
+        else:
+            c, h, w = image_shape
         self.conv = Conv2dModel(
             in_channels=c,
             channels=channels or [32, 64, 64],
