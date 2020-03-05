@@ -29,13 +29,9 @@ class AtariDqnModel(torch.nn.Module):
         stored within this method."""
         super().__init__()
         self.dueling = dueling
-        if len(image_shape) == 4:
-            n, c, h, w = image_shape
-            c = n * c
-        else:
-            c, h, w = image_shape
+        n, c, h, w = image_shape
         self.conv = Conv2dModel(
-            in_channels=c,
+            in_channels=n * c,
             channels=channels or [32, 64, 64],
             kernel_sizes=kernel_sizes or [8, 4, 3],
             strides=strides or [4, 2, 1],
@@ -62,9 +58,9 @@ class AtariDqnModel(torch.nn.Module):
         img = img.mul_(1. / 255)  # From [0-255] to [0-1], in place.
 
         # Infer (presence of) leading dimensions: [T,B], [B], or [].
-        lead_dim, T, B, img_shape = infer_leading_dims(img, 3)
+        lead_dim, T, B, (n, c, h, w) = infer_leading_dims(img, 4)
 
-        conv_out = self.conv(img.view(T * B, *img_shape))  # Fold if T dimension.
+        conv_out = self.conv(img.view(T * B, n * c, h, w))  # Fold if T dimension.
         q = self.head(conv_out.view(T * B, -1))
 
         # Restore leading dimensions: [T,B], [B], or [], as input.

@@ -87,7 +87,7 @@ class AtariEnv(Env):
         # Spaces
         self._action_set = self.ale.getMinimalActionSet()
         self._action_space = IntBox(low=0, high=len(self._action_set))
-        obs_shape = (num_img_obs, H, W)
+        obs_shape = (num_img_obs, 1, H, W)
         self._observation_space = IntBox(low=0, high=255, shape=obs_shape,
             dtype="uint8")
         self._max_frame = self.ale.getScreenGrayscale()
@@ -157,7 +157,7 @@ class AtariEnv(Env):
         np.maximum(self._raw_frame_1, self._raw_frame_2, self._max_frame)
         img = cv2.resize(self._max_frame[1:-1], (W, H), cv2.INTER_NEAREST)
         # NOTE: order OLDEST to NEWEST should match use in frame-wise buffer.
-        self._obs = np.concatenate([self._obs[1:], img[np.newaxis]])
+        self._obs = np.concatenate([self._obs[1:], img[np.newaxis, np.newaxis]])
 
     def _reset_obs(self):
         self._obs[:] = 0
