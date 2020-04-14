@@ -243,14 +243,14 @@ class MinibatchRl(MinibatchRlBase):
         super().__init__(**kwargs)
         self.log_traj_window = int(log_traj_window)
 
-    def train(self):
+    def train(self, itr_offset=0):
         """
         Performs startup, then loops by alternating between
         ``sampler.obtain_samples()`` and ``algo.optimize_agent()``, logging
         diagnostics at the specified interval.
         """
         n_itr = self.startup()
-        for itr in range(n_itr):
+        for itr in range(itr_offset, n_itr):
             logger.set_iteration(itr)
             with logger.prefix(f"itr #{itr} "):
                 self.agent.sample_mode(itr)  # Might not be this agent sampling.
