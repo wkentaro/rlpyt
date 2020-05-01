@@ -1,6 +1,7 @@
 
 import numpy as np
 
+from rlpyt.utils.collections import is_namedarraytuple
 from rlpyt.replays.non_sequence.n_step import NStepReturnBuffer
 from rlpyt.replays.frame import FrameBufferMixin
 from rlpyt.replays.non_sequence.uniform import UniformReplay
@@ -20,8 +21,15 @@ class NStepFrameBuffer(FrameBufferMixin, NStepReturnBuffer):
         # Begin/end frames duplicated in samples_frames so no wrapping here.
         # return np.stack([self.samples_frames[t:t + self.n_frames, b]
         #     for t, b in zip(T_idxs, B_idxs)], axis=0)  # [B,C,H,W]
-        observation = np.stack([self.samples_frames[t:t + self.n_frames, b]
-            for t, b in zip(T_idxs, B_idxs)], axis=0)  # [B,C,H,W]
+        if is_namedarraytuple(self.samples_frames):
+            stacked = {}
+            for k, arr in self.samples_frames.items():
+                stacked[k] = np.stack([arr[t:t + self.n_frames, b]
+                    for t, b in zip(T_idxs, B_idxs)], axis=0)
+            observation = type(self.samples_frames)(**stacked)
+        else:
+            observation = np.stack([self.samples_frames[t:t + self.n_frames, b]
+                for t, b in zip(T_idxs, B_idxs)], axis=0)  # [B,C,H,W]
         # Populate empty (zero) frames after environment done.
         for f in range(1, self.n_frames):
             # e.g. if done 1 step prior, all but newest frame go blank.
