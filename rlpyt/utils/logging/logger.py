@@ -335,7 +335,10 @@ def save_itr_params(itr, params):
             file_name = osp.join(get_snapshot_dir(), 'itr_%08d.pkl' % itr)
         elif _snapshot_mode == 'last':
             # override previous params
-            file_name = osp.join(get_snapshot_dir(), 'params.pkl')
+            if itr == 0 or (itr + 1) % _snapshot_gap == 0:
+                file_name = osp.join(get_snapshot_dir(), 'itr_last.pkl')
+            else:
+                return
         elif _snapshot_mode == "gap":
             if itr == 0 or (itr + 1) % _snapshot_gap == 0:
                 file_name = osp.join(get_snapshot_dir(), 'itr_%08d.pkl' % itr)
