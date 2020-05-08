@@ -58,6 +58,10 @@ class RlAlgorithm:
         multiple optimizers."""
         return self.optimizer.state_dict()
 
+    def replay_buffer_state_dict(self):
+        """Return the replay buffer state dict."""
+        return self.replay_buffer.state_dict()
+
     def load_optim_state_dict(self, state_dict):
         """Load an optimizer state dict; should expect the format returned
         from ``optim_state_dict().``"""

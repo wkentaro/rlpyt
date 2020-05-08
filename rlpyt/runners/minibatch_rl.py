@@ -142,6 +142,7 @@ class MinibatchRlBase(BaseRunner):
             cum_steps=itr * self.sampler.batch_size * self.world_size,
             agent_state_dict=self.agent.state_dict(),
             optimizer_state_dict=self.algo.optim_state_dict(),
+            replay_buffer_state_dict=self.algo.replay_buffer_state_dict(),
         )
 
     def save_itr_snapshot(self, itr):

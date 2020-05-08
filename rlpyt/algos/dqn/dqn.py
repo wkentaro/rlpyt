@@ -55,6 +55,7 @@ class DQN(RlAlgorithm):
             default_priority=None,
             ReplayBufferCls=None,  # Leave None to select by above options.
             updates_per_sync=1,  # For async mode only.
+            initial_replay_buffer_state_dict=None,
             ):
         """Saves input arguments.  
 
@@ -154,6 +155,9 @@ class DQN(RlAlgorithm):
             ReplayCls = (AsyncUniformReplayFrameBuffer if async_ else
                 UniformReplayFrameBuffer)
         self.replay_buffer = ReplayCls(**replay_kwargs)
+        if self.initial_replay_buffer_state_dict:
+            self.replay_buffer.load_state_dict(
+                self.initial_replay_buffer_state_dict)
 
     def optimize_agent(self, itr, samples=None, sampler_itr=None):
         """

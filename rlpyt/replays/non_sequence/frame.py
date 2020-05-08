@@ -37,6 +37,51 @@ class NStepFrameBuffer(FrameBufferMixin, NStepReturnBuffer):
             observation[b_blanks, :self.n_frames - f] = 0
         return observation
 
+    def load_state_dict(self, state_dict):
+        assert self.T == state_dict["T"]
+        assert self.B == state_dict["B"]
+        assert self.size == state_dict["size"]
+        assert self.discount == state_dict["discount"]
+        assert self.n_step_return == state_dict["n_step_return"]
+        self.t = t
+        assert self.samples.shape == state_dict["samples"].shape
+        self.samples = state_dict["samples"]
+        self.samples_return_ = state_dict["samples_return_"]
+        self.samples_done_n = state_dict["samples_done_n"]
+        self._buffer_full = state_dict["_buffer_full"]
+        self.off_backward = state_dict["off_backward"]
+
+        self.n_frames = state_dict["n_frames"]
+        assert self.samples_frames.shape == state_dict["samples_frames"].shape
+        self.samples_frames = state_dict["samples_frames"]
+        assert (
+            self.samples_new_frames.shape
+            == state_dict["samples_new_frames"].shape
+        )
+        self.samples_new_frames = state_dict["samples_new_frames"]
+        self.off_forward = state_dict["off_forward"]
+
+    def state_dict(self):
+        return dict(
+            # NStepReturnBuffer
+            T=self.T,
+            B=self.B,
+            size=self.size,
+            discount=self.discount,
+            n_step_return=self.n_step_return,
+            t=self.t,
+            samples=self.samples,
+            samples_return_=self.samples_return_,
+            samples_done_n=self.samples_done_n,
+            _buffer_full=self._buffer_full,
+            off_backward=self.off_backward,
+            # FrameBufferMixin
+            n_frames=self.n_frames,
+            samples_frames=self.samples_frames,
+            samples_new_frames=self.samples_new_frames,
+            off_forward=self.off_forward,
+        )
+
 
 class UniformReplayFrameBuffer(UniformReplay, NStepFrameBuffer):
     pass
