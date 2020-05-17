@@ -457,6 +457,8 @@ def record_tabular_misc_stat(key, values, placement='back'):
         if _tf_summary_writer is not None:
             prefix += "/"  # Group stats together in Tensorboard.
     if len(values) > 0:
+        if isinstance(values[0], torch.Tensor):
+            values = [v.cpu().numpy() for v in values]
         record_tabular(prefix + "Average" + suffix, np.average(values))
         record_tabular(prefix + "Std" + suffix, np.std(values))
         record_tabular(prefix + "Median" + suffix, np.median(values))
